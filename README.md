@@ -37,6 +37,67 @@ debug: false
 ```
 
 # USAGE
+Advanced Role:
+```CS
+using CustomPlayerEffects;
+using CustomRolesCrimsonBreach.API.CustomRole;
+using LabApi.Events.Arguments.PlayerEvents;
+using PlayerRoles;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace AllCustomRoles.CustomRoles.ClassD
+{
+    internal class velocista : CustomRole
+    {
+        public override string Name => "Velocista";
+        public override string CustomInfo => "Velocista";
+        public override uint Id => 2;
+
+        public override int health { get; set; } = 100;
+
+        public override RoleTypeId BaseRole => RoleTypeId.ClassD;
+
+        public override float SpawnPorcentage => 20f;
+
+        public override Vector3 Scale { get; set; } = new Vector3(1f, 1f, 1f);
+        public override bool KeepRoleWithScapeOrSomethingIDK => true;
+        public override List<string> Inventory { get; set; } = new List<string>()
+        {
+            $"{ItemType.Adrenaline}",
+            $"{ItemType.Flashlight}",
+        };
+
+        public override void EventsCustom()
+        {
+            LabApi.Events.Handlers.PlayerEvents.UsedItem += OnUsingItem;
+            base.EventsCustom();
+        }
+
+        public override void UnEventsCustom()
+        {
+            LabApi.Events.Handlers.PlayerEvents.UsedItem -= OnUsingItem;
+            base.UnEventsCustom();
+        }
+
+
+        public void OnUsingItem(PlayerUsedItemEventArgs ev)
+        {
+            if (!HasRole(ev.Player, this))
+            {
+                return;
+            }
+
+            if (ev.UsableItem.Type == ItemType.Adrenaline) 
+            {
+                ev.Player.EnableEffect<MovementBoost>(intensity: 15, duration: 8);
+            }
+        } 
+    }
+}
+
+```
+
 Role Example:
 ```CS
 using AllCustomRoles.HabilidadesCustom;
