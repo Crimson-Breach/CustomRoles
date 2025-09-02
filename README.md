@@ -1,5 +1,18 @@
 A API to make a CustomRoles and CustomHabilitys
 
+# Commands
+```
+.useskill
+```
+Command to use the skill
+```
+.info
+```
+See the information about the skill you have
+```
+CustomRoles <Spawn>, <List> or <abilityList> 
+```
+
 # USAGE
 Role Example:
 ```CS
@@ -78,15 +91,6 @@ namespace AllCustomRoles.HabilidadesCustom
 }
 ```
 
-# Commands
-```
-.useskill
-```
-Command to use the skill
-```
-.info
-```
-See the information about the skill you have
-```
-CustomRoles <Spawn>, <List> or <abilityList> 
-```
+
+
+
