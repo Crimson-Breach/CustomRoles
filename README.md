@@ -13,6 +13,29 @@ See the information about the skill you have
 CustomRoles <Spawn>, <List> or <abilityList> 
 ```
 
+# Config
+
+```yaml
+# Message shown when a player tries to use a command without the required permissions.
+dont_have_access: You do not have permission for this command!
+# Message displayed when a role is successfully assigned to a player.
+role_added: <b><color=yellow>You are <color=blue>%name%</color><color=#3a3a3a>!</color></b>
+# Message displayed when a role is removed from a player.
+role_removed: <b><color=yellow>You are <color=red>no longer</color> <color=blue>%name%</color><color=#3a3a3a>!</color></b>
+# Message shown when the player's CustomRole does not have a skill assigned.
+you_dont_have_skill_in_your_custom_role: Your CustomRole does not have an assigned skill
+# Message displayed when a player uses their skill.
+use_hability: skill used
+# Message shown when a player tries to use a skill that is on cooldown.
+ability_cooldown_message: The skill is loading, wait MINUTES:SECONDS minutes.
+# Message displayed when the skill cooldown has finished and is ready again.
+ability_cooldown_succesfull: The skill is ready to be used again!
+# Message shown when a player tries to check their skill info without having a CustomRole.
+you_need_a_custom_role_message: You need to have a CustomRole to be able to see your skill information
+# Enables or disables debug mode (for logging and testing purposes).
+debug: false
+```
+
 # USAGE
 Role Example:
 ```CS
