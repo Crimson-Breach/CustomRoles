@@ -1,4 +1,4 @@
-A API to make a CustomRoles and CustomHabilitys
+A API to make a CustomRoles and CustomHabilitys for LabApi
 
 # Commands
 ```
