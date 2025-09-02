@@ -25,7 +25,7 @@ public class Main : Plugin<Config>
         LabApi.Events.Handlers.PlayerEvents.Death += playerHandler.OnKillDeath;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += playerHandler.OnChangedRole;
 
-        CustomAbility.RegisterAbilities();
+        CustomAbility.RegisterSkills();
         CustomRoleHandler.RegisterRoles();
     }
 
@@ -36,6 +36,7 @@ public class Main : Plugin<Config>
         LabApi.Events.Handlers.PlayerEvents.Death -= playerHandler.OnKillDeath;
 
         CustomRoleHandler.UnRegisterRoles();
+        CustomAbility.UnRegisterSkills();
         playerHandler = null;
         Instance = null;
     }

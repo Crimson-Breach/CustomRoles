@@ -39,7 +39,7 @@ public abstract class CustomAbility
         return Registered.Remove(this);
     }
 
-    public static IEnumerable<CustomAbility> RegisterAbilities()
+    public static IEnumerable<CustomAbility> RegisterSkills()
     {
         List<CustomAbility> items = new();
         Assembly assembly = Assembly.GetExecutingAssembly();
@@ -63,7 +63,7 @@ public abstract class CustomAbility
         return items;
     }
 
-    public static IEnumerable<CustomAbility> UnRegisterRoles()
+    public static IEnumerable<CustomAbility> UnRegisterSkills()
     {
         var items = Registered.ToList();
         foreach (var item in items)

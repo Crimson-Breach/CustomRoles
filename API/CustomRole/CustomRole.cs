@@ -44,12 +44,12 @@ public abstract class CustomRole
         return CustomRoleHandler.Registered.Remove(this);
     }
 
-    public virtual void EvetsCustoms()
+    public virtual void EventsCustom()
     {
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += PlayerChangeRole;
     }
 
-    public virtual void UnEventsCustoms()
+    public virtual void UnEventsCustom()
     {
         LabApi.Events.Handlers.PlayerEvents.ChangedRole -= PlayerChangeRole;
     }

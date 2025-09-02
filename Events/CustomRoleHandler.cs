@@ -59,7 +59,7 @@ public class CustomRoleHandler
 
                 if (Activator.CreateInstance(type) is CustomRole instance && instance.TryRegister())
                 {
-                    instance.EvetsCustoms();
+                    instance.EventsCustom();
                     items.Add(instance);
                 }
             }

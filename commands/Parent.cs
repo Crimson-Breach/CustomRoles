@@ -23,7 +23,7 @@ public class Parent : ParentCommand
 
     protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        response = "Error, you need to put a subcommand: list and spawn";
+        response = "Error, you need to put a subcommand: <list>, <spawn> or <abilityList>";
         return true;
     }
 }
