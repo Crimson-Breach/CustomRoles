@@ -113,7 +113,20 @@ namespace AllCustomRoles.HabilidadesCustom
     }
 }
 ```
+Register Role and Skill:
+```CS
+    public override void Enable()
+    {
+        CustomAbility.RegisterSkills();
+        CustomRoleHandler.RegisterRoles();
+    }
 
+    public override void Disable()
+    {
+        CustomRoleHandler.UnRegisterRoles();
+        CustomAbility.UnRegisterSkills();
+    }
+```
 
 
 
