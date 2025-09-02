@@ -1,4 +1,5 @@
 ﻿using CommandSystem;
+using CustomRolesCrimsonBreach.commands.Child2;
 using CustomRolesCrimsonBreach.commands.Childs;
 using System;
 
@@ -17,6 +18,7 @@ public class Parent : ParentCommand
     {
         RegisterCommand(new Spawn());
         RegisterCommand(new List());
+        RegisterCommand(new ListAbility());
     }
 
     protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
