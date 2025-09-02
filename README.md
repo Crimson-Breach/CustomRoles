@@ -77,3 +77,16 @@ namespace AllCustomRoles.HabilidadesCustom
     }
 }
 ```
+
+# Commands
+```
+.useskill
+```
+Command to use the skill
+```
+.info
+```
+See the information about the skill you have
+```
+CustomRoles <Spawn>, <List> or <abilityList> 
+```
