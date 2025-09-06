@@ -43,12 +43,6 @@
     <Reference Include="CommandSystem.Core">
       <HintPath>D:\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.API">
-      <HintPath>..\..\..\..\Desktop\Exield\Exiled.API.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.CustomItems">
-      <HintPath>..\..\..\..\Desktop\Exield\Exiled.CustomItems.dll</HintPath>
-    </Reference>
     <Reference Include="LabApi, Version=1.1.1.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\RolePlayCore\packages\Northwood.LabAPI.1.1.1\lib\net48\LabApi.dll</HintPath>
     </Reference>

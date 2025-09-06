@@ -1,5 +1,4 @@
 ﻿using CustomRolesCrimsonBreach.Events;
-using Exiled.CustomItems.API.Features;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
@@ -80,10 +79,9 @@ public abstract class CustomRole
 
             roles.Add(this);
 
-            player.CustomInfo = $"{CustomInfo}";
+
             player.SendHint(Main.Instance.Config.RoleAdded.Replace("%name%", Name), 10);
-            player.MaxHealth = health;
-            player.Health = health;
+
 
             if (!GiveOnlyTheAbility)
             {
@@ -91,10 +89,16 @@ public abstract class CustomRole
             }
             
             LabApi.Features.Console.Logger.Debug($"{Name}: Item added {player.Nickname}", Main.Instance.Config.debug);
+            MEC.Timing.CallDelayed(0.5f, () =>
+            {
 
-            player.Scale = Scale;
+                player.Scale = Scale;
+                player.MaxHealth = health;
+                player.Health = health;
+                player.CustomInfo = $"{CustomInfo}";
+            });
 
-            foreach (string itemName in this.Inventory)
+            foreach (string itemName in Inventory)
             {
                 LabApi.Features.Console.Logger.Info($"{Name}: Adding {itemName} to inventory.");
                 TryAddItem(player, itemName);
@@ -113,12 +117,12 @@ public abstract class CustomRole
     {
         LabApi.Features.Console.Logger.Debug($"{Name}: TryAddItem intentando con: {itemName}", Main.Instance.Config.debug);
 
-        if (CustomItem.TryGet(itemName, out CustomItem? customItem))
+        /*if (CustomItem.TryGet(itemName, out CustomItem? customItem))
         {
             LabApi.Features.Console.Logger.Debug($"{Name}: Es un CustomItem válido: {customItem.Name}", Main.Instance.Config.debug);
             customItem?.Give(player, DisplayMessageRole);
             return true;
-        }
+        }*/
 
         if (Enum.TryParse(itemName, out ItemType type))
         {
