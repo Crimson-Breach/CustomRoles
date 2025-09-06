@@ -13,8 +13,6 @@ public abstract class CustomRole
 {
     protected static Dictionary<string, HashSet<CustomRole>> _players = new();
     public event EventHandler<SpawningCustomRole>? Spawning;
-
-
     public abstract string Name { get; }
     public abstract string CustomInfo { get; }
     public abstract uint Id { get; }
@@ -26,9 +24,9 @@ public abstract class CustomRole
     public virtual List<string> Inventory { get; set; } = new();
     public virtual Dictionary<ItemType, ushort> AmmoItems { get; set; } = new();
     public virtual CustomAbility CustomAbility { get; set; }
-    public virtual int health { get; set; }
+    public virtual int health { get; set; } = 100;
     public virtual int spawnNumber { get; set; } = 0;
-    public virtual bool GiveOnlyTheAbility { get; set;} = true;
+    public virtual bool GiveOnlyTheAbility { get; set;} = false;
 
     public virtual bool TryRegister()
     {
@@ -91,7 +89,6 @@ public abstract class CustomRole
             LabApi.Features.Console.Logger.Debug($"{Name}: Item added {player.Nickname}", Main.Instance.Config.debug);
             MEC.Timing.CallDelayed(0.5f, () =>
             {
-
                 player.Scale = Scale;
                 player.MaxHealth = health;
                 player.Health = health;
@@ -116,13 +113,6 @@ public abstract class CustomRole
     protected bool TryAddItem(Player player, string itemName)
     {
         LabApi.Features.Console.Logger.Debug($"{Name}: TryAddItem intentando con: {itemName}", Main.Instance.Config.debug);
-
-        /*if (CustomItem.TryGet(itemName, out CustomItem? customItem))
-        {
-            LabApi.Features.Console.Logger.Debug($"{Name}: Es un CustomItem válido: {customItem.Name}", Main.Instance.Config.debug);
-            customItem?.Give(player, DisplayMessageRole);
-            return true;
-        }*/
 
         if (Enum.TryParse(itemName, out ItemType type))
         {
