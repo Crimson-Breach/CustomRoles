@@ -1,12 +1,19 @@
 ﻿using CustomRolesCrimsonBreach.API.CustomRole.SpawnAPI;
+using CustomRolesCrimsonBreach.API.Hat;
 using CustomRolesCrimsonBreach.Events;
+using GameCore;
 using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Features.Console;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
+using ProjectMER.Configs;
+using ProjectMER.Features;
+using ProjectMER.Features.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Logger = LabApi.Features.Console.Logger;
 
 namespace CustomRolesCrimsonBreach.API.CustomRole;
 
@@ -21,6 +28,15 @@ public abstract class CustomRole
     public abstract float SpawnPorcentage { get; }
     public abstract Vector3 Scale { get; set; }
     public abstract SpawnProperties SpawnProperties { get; set; }
+
+    /// HAT CONFIGS
+    public virtual string HatName { get; set; } = string.Empty;
+    public virtual Vector3 HatPosition { get; set; } = new Vector3(0, 0.25f, 0);
+    public virtual Vector3 HatRotation { get; set; } = Vector3.one;
+    public virtual Vector3 HatScale { get; set; } = Vector3.one;
+    public virtual bool HatVisibleForOwner { get; set; } = false;
+
+    /// HAT CONFIGS
     public virtual bool DisplayMessageRole { get; set; } = true;
     public virtual bool KeepRoleWithScapeOrSomethingIDK => false;
     public virtual List<string> Inventory { get; set; } = new();
@@ -34,7 +50,7 @@ public abstract class CustomRole
     {
         if (CustomRoleHandler.Registered.Any(c => c.Id == Id)) return false;
         CustomRoleHandler.Registered.Add(this);
-        LabApi.Features.Console.Logger.Info($"Register: {Name} ({GetHashCode()})");
+        Logger.Info($"Register: {Name} ({GetHashCode()})");
         return true;
     }
 
@@ -69,7 +85,7 @@ public abstract class CustomRole
 
         MEC.Timing.CallDelayed(1.5f, () =>
         {
-            LabApi.Features.Console.Logger.Debug($"{Name}: Assingning role to {player.Nickname}, Role instance: {GetHashCode()}", Main.Instance.Config.debug);
+            Logger.Debug($"{Name}: Assingning role to {player.Nickname}, Role instance: {GetHashCode()}", Main.Instance.Config.debug);
 
             if (!_players.TryGetValue(player.UserId, out var roles))
             {
@@ -79,9 +95,10 @@ public abstract class CustomRole
 
             roles.Add(this);
 
-
-            player.SendHint(Main.Instance.Config.RoleAdded.Replace("%name%", Name), 10);
-
+            if (DisplayMessageRole)
+            {
+                player.SendHint(Main.Instance.Config.RoleAdded.Replace("%name%", Name), 10);
+            }
 
             if (!GiveOnlyTheAbility)
             {
@@ -95,8 +112,13 @@ public abstract class CustomRole
                 }
             }
 
+            if (!string.IsNullOrEmpty(HatName))
+            {
+                GiveHat(player);
+            }
 
-            LabApi.Features.Console.Logger.Debug($"{Name}: Item added {player.Nickname}", Main.Instance.Config.debug);
+
+            Logger.Debug($"{Name}: Item added {player.Nickname}", Main.Instance.Config.debug);
             MEC.Timing.CallDelayed(0.5f, () =>
             {
                 player.Scale = Scale;
@@ -122,6 +144,43 @@ public abstract class CustomRole
         OnAssigned(player);
     }
 
+    private void GiveHat(Player player)
+    {
+        if (string.IsNullOrEmpty(HatName))
+            return;
+
+        var hatConfig = new SchematicConfig
+        {
+            SchematicName = HatName,
+            Offset = HatPosition, 
+            Rotation = HatRotation,
+            Scale = HatScale,
+            IsSchematicVisibleForOwner = HatVisibleForOwner
+        };
+
+        var hat = SpawnSchematic(hatConfig);
+        if (hat is null)
+        {
+            Logger.Debug($"The hat could not be spawned: {HatName}", Main.Instance.Config.debug);
+            return;
+        }
+
+        hat.transform.position = player.Position + hatConfig.Offset;
+        hat.transform.rotation = player.Rotation;
+
+        hat.transform.parent = player.GameObject.transform;
+    }
+
+    private SchematicObject SpawnSchematic(SchematicConfig config)
+    {
+        return ObjectSpawner.SpawnSchematic(
+            config.SchematicName,
+            Vector3.zero,
+            config.Rotation,
+            config.Scale
+        );
+    }
+
     public virtual void RoleAdded(Player player) 
     {
     }
@@ -138,18 +197,19 @@ public abstract class CustomRole
 
     protected bool TryAddItem(Player player, string itemName)
     {
-        LabApi.Features.Console.Logger.Debug($"{Name}: TryAddItem intentando con: {itemName}", Main.Instance.Config.debug);
+        Logger.Debug($"{Name}: TryAddItem intentando con: {itemName}", Main.Instance.Config.debug);
 
         if (Enum.TryParse(itemName, out ItemType type))
         {
-            LabApi.Features.Console.Logger.Debug($"{Name}: Its a valid ItemType: {type}", Main.Instance.Config.debug);
+            Logger.Debug($"{Name}: Its a valid ItemType: {type}", Main.Instance.Config.debug);
             player.AddItem(type);
             return true;
         }
 
-        LabApi.Features.Console.Logger.Debug($"{Name}: TryAddItem error. {itemName} its not valid.", Main.Instance.Config.debug);
+        Logger.Debug($"{Name}: TryAddItem error. {itemName} its not valid.", Main.Instance.Config.debug);
         return false;
     }
+
     public virtual void RemoveRole(Player player)
     {
         if (!_players.TryGetValue(player.UserId, out var roles)) return;
@@ -159,8 +219,10 @@ public abstract class CustomRole
         if (roles.Count == 0)
             _players.Remove(player.UserId);
 
-
-        player.SendHint( Main.Instance.Config.RoleRemoved.Replace("%name%", Name) , 10 );
+        if (DisplayMessageRole)
+        {
+            player.SendHint(Main.Instance.Config.RoleRemoved.Replace("%name%", Name), 10);
+        }
         player.CustomInfo = null;
 
         RemovedRole(player);

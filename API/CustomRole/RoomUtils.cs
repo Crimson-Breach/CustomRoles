@@ -18,7 +18,5 @@ namespace CustomRolesCrimsonBreach.API.CustomRole
 
             return room.Position + spawnPoint.Offset;
         }
-
     }
-
 }
