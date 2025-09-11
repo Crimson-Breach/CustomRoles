@@ -36,6 +36,8 @@ public abstract class CustomRole
     public virtual Vector3 HatScale { get; set; } = Vector3.one;
     public virtual bool HatVisibleForOwner { get; set; } = false;
 
+    private readonly Dictionary<string, SchematicObject> _hats = new();
+
     /// HAT CONFIGS
     public virtual bool DisplayMessageRole { get; set; } = true;
     public virtual bool KeepRoleWithScapeOrSomethingIDK => false;
@@ -129,7 +131,7 @@ public abstract class CustomRole
 
             foreach (string itemName in Inventory)
             {
-                LabApi.Features.Console.Logger.Info($"{Name}: Adding {itemName} to inventory.");
+                Logger.Info($"{Name}: Adding {itemName} to inventory.");
                 TryAddItem(player, itemName);
             }
 
@@ -169,6 +171,17 @@ public abstract class CustomRole
         hat.transform.rotation = player.Rotation;
 
         hat.transform.parent = player.GameObject.transform;
+
+        _hats[player.UserId] = hat;
+    }
+
+    private void RemoveHat(Player player)
+    {
+        if (_hats.TryGetValue(player.UserId, out var hat))
+        {
+            hat.Destroy();
+            _hats.Remove(player.UserId);
+        }
     }
 
     private SchematicObject SpawnSchematic(SchematicConfig config)
@@ -215,6 +228,8 @@ public abstract class CustomRole
         if (!_players.TryGetValue(player.UserId, out var roles)) return;
 
         if (!roles.Remove(this)) return;
+
+        RemoveHat(player);
 
         if (roles.Count == 0)
             _players.Remove(player.UserId);
