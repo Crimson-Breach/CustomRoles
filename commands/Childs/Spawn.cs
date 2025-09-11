@@ -7,107 +7,94 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CustomRolesCrimsonBreach.commands.Childs;
-
-[CommandHandler(typeof(Parent))]
-public class Spawn : ICommand
+namespace CustomRolesCrimsonBreach.commands.Childs
 {
-    public string Command => "spawn";
-
-    public string[] Aliases => [];
-
-    public string Description => "comando para spawn customrole";
-
-    public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
+    [CommandHandler(typeof(Parent))]
+    public class Spawn : ICommand
     {
-        Player pl = Player.Get(sender);
+        public string Command => "spawn";
+        public string[] Aliases => Array.Empty<string>();
+        public string Description => "Comando para spawn customrole";
 
-        if (!pl.HasPermissions("customitems.give"))
+        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            //response = "Permission Denied: Requires 'customitems.give'";
-            response = Main.Instance.Config.DontHaveAccess;
-            return false;
-        }
+            Player executor = Player.Get(sender);
 
-        if (arguments.Count == 0)
-        {
-            response = "Usage: give <item name or ID> [player name/UserID/*]";
-            return false;
-        }
-
-        string roleName = arguments.At(0);
-
-        if (!CustomRoleHandler.Registered.Any())
-        {
-            response = "No CustomRoles registered.";
-            return false;
-        }
-
-        var Role = CustomRoleHandler.Registered.FirstOrDefault(i =>
-            i.Name.Equals(roleName, StringComparison.OrdinalIgnoreCase) ||
-            i.Id.ToString() == roleName);
-
-        if (Role is null)
-        {
-            response = $"Custom role '{roleName}' not found.";
-            return false;
-        }
-
-        if (arguments.Count == 1)
-        {
-            if (sender is Player pcs)
+            if (!executor.HasPermissions("customitems.give"))
             {
+                response = Main.Instance.Config.DontHaveAccess;
+                return false;
+            }
 
-                if (pcs is null)
+            if (arguments.Count == 0)
+            {
+                response = "Usage: spawn <CustomRole ID/Name> [player name/UserID/*]";
+                return false;
+            }
+
+            string roleName = arguments.At(0);
+
+            var role = CustomRoleHandler.Registered.FirstOrDefault(i =>
+                i.Name.Equals(roleName, StringComparison.OrdinalIgnoreCase) ||
+                i.Id.ToString() == roleName);
+
+            if (role == null)
+            {
+                response = $"Custom role '{roleName}' not found.";
+                return false;
+            }
+
+            List<Player> targets = new List<Player>();
+
+            if (arguments.Count == 1)
+            {
+                if (executor != null)
+                    targets.Add(executor);
+
+                else
                 {
-                    response = "Error: Target player not found.";
+                    response = "You must specify a player when running from console.";
                     return false;
                 }
-
-                Role.AddRole(pcs);
-                response = $"Gave {Role.Name} to {pcs.Nickname}.";
-                return true;
             }
-
-            response = "Please specify a player when running from console.";
-            return false;
-        }
-
-        string targetArg = string.Join(" ", arguments.Skip(1));
-
-        IEnumerable<Player> targets = targetArg is "*" or "all"
-            ? Player.List.Where(IsEligible)
-            : Player.List.Where(p =>
-                p.Nickname.IndexOf(targetArg, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                p.UserId.IndexOf(targetArg, StringComparison.OrdinalIgnoreCase) >= 0);
-
-        int givenCount = 0;
-        foreach (Player player in targets)
-        {
-            if (IsEligible(player))
+            else
             {
-                Role.AddRole(player);
-                givenCount++;
-            }
-        }
+                string targetArg = arguments.At(1);
 
-        if (givenCount == 0)
-        {
-            Player player = Player.Get(sender);
-            if (IsEligible(player))
+                if (targetArg == "*" || targetArg.ToLower() == "all")
+                {
+                    targets = Player.List.ToList();
+                }
+                else
+                {
+                    Player targetById = Player.List.FirstOrDefault(p => p.UserId == targetArg);
+                    if (targetById != null)
+                    {
+                        targets.Add(targetById);
+                    }
+                    else
+                    {
+                        // Buscar por nombre parcial
+                        targets = Player.List
+                            .Where(p => p.Nickname.IndexOf(targetArg, StringComparison.OrdinalIgnoreCase) >= 0)
+                            .ToList();
+                    }
+                }
+            }
+
+            if (targets.Count == 0)
             {
-                Role.AddRole(player);
-                givenCount++;
+                response = "No valid target players found.";
+                return false;
             }
 
-            response = $"Gave {Role.Name} to {givenCount} player(s).";
-            return false;
-        }
+            foreach (Player target in targets)
+            {
+                role.AddRole(target);
+            }
 
-        response = $"Gave {Role.Name} to {givenCount} player(s).";
-        return true;
+            response = $"Gave {role.Name} to {targets.Count} player(s).";
+            return true;
+        }
     }
-
-    private bool IsEligible(Player player) =>
-        player.IsAlive;
 }
