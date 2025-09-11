@@ -189,5 +189,28 @@ Register Role and Skill:
     }
 ```
 
+Room Spawn point example:
+```CS
+        public override SpawnProperties SpawnProperties { get; set; } = new SpawnProperties()
+        {
+            StaticSpawnPoints = new List<SpawnPoint>
+            {
+                new SpawnPoint
+                {
+                    Room = RoomName.Hcz049,
+                    Offset = new Vector3(0, 1, 0),
+                    Rotation = Quaternion.identity
+                },
+                new SpawnPoint
+                {
+                    Room = RoomName.LczArmory,
+                    Offset = new Vector3(0, 1, 0),
+                    Rotation = Quaternion.Euler(0, 180, 0)
+                }
+            },
+            Limit = 1
+        };
+```
+
 
 
