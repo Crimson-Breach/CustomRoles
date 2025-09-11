@@ -122,7 +122,7 @@ public abstract class CustomRole
         OnAssigned(player);
     }
 
-    public virtual void RoleAdded(Player player)
+    public virtual void RoleAdded(Player player) 
     {
     }
 
@@ -162,7 +162,13 @@ public abstract class CustomRole
 
         player.SendHint( Main.Instance.Config.RoleRemoved.Replace("%name%", Name) , 10 );
         player.CustomInfo = null;
+
+        RemovedRole(player);
         OnRemoved(player);
+    }
+
+    public virtual void RemovedRole(Player player)
+    {
     }
 
     public static bool HasRole(Player player, CustomRole role)
