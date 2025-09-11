@@ -79,9 +79,10 @@ public abstract class CustomRole
 
             roles.Add(this);
 
-
-            player.SendHint(Main.Instance.Config.RoleAdded.Replace("%name%", Name), 10);
-
+            if (DisplayMessageRole)
+            {
+                player.SendHint(Main.Instance.Config.RoleAdded.Replace("%name%", Name), 10);
+            }
 
             if (!GiveOnlyTheAbility)
             {
@@ -159,8 +160,11 @@ public abstract class CustomRole
         if (roles.Count == 0)
             _players.Remove(player.UserId);
 
+        if (DisplayMessageRole) 
+        {
+            player.SendHint(Main.Instance.Config.RoleRemoved.Replace("%name%", Name), 10);
+        }
 
-        player.SendHint( Main.Instance.Config.RoleRemoved.Replace("%name%", Name) , 10 );
         player.CustomInfo = null;
 
         RemovedRole(player);
