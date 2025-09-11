@@ -1,4 +1,5 @@
-﻿using CustomRolesCrimsonBreach.Events;
+﻿using CustomRolesCrimsonBreach.API.CustomRole.SpawnAPI;
+using CustomRolesCrimsonBreach.Events;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
@@ -18,8 +19,9 @@ public abstract class CustomRole
     public abstract uint Id { get; }
     public abstract RoleTypeId BaseRole { get; }
     public abstract float SpawnPorcentage { get; }
+    public abstract Vector3 Scale { get; set; }
+    public abstract SpawnProperties SpawnProperties { get; set; }
     public virtual bool DisplayMessageRole { get; set; } = true;
-    public abstract Vector3 Scale { get; set; } 
     public virtual bool KeepRoleWithScapeOrSomethingIDK => false;
     public virtual List<string> Inventory { get; set; } = new();
     public virtual Dictionary<ItemType, ushort> AmmoItems { get; set; } = new();
@@ -84,8 +86,16 @@ public abstract class CustomRole
             if (!GiveOnlyTheAbility)
             {
                 player.SetRole(BaseRole);
+
+                var spawnPoint = GetRandomSpawnPoint();
+                if (spawnPoint != null)
+                {
+                    player.Position = RoomUtils.GetSpawnPosition(spawnPoint);
+                    player.Rotation = spawnPoint.Rotation;
+                }
             }
-            
+
+
             LabApi.Features.Console.Logger.Debug($"{Name}: Item added {player.Nickname}", Main.Instance.Config.debug);
             MEC.Timing.CallDelayed(0.5f, () =>
             {
@@ -107,7 +117,23 @@ public abstract class CustomRole
             }
         });
 
+
+        RoleAdded(player);
         OnAssigned(player);
+    }
+
+    public virtual void RoleAdded(Player player)
+    {
+    }
+
+    private SpawnPoint? GetRandomSpawnPoint()
+    {
+        if (SpawnProperties == null || SpawnProperties.StaticSpawnPoints.Count == 0)
+            return null;
+
+        return SpawnProperties.StaticSpawnPoints[
+            UnityEngine.Random.Range(0, SpawnProperties.StaticSpawnPoints.Count)
+        ];
     }
 
     protected bool TryAddItem(Player player, string itemName)

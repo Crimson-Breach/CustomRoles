@@ -76,6 +76,10 @@
   <ItemGroup>
     <Compile Include="API\CustomRole\CustomAbility.cs" />
     <Compile Include="API\CustomRole\CustomRole.cs" />
+    <Compile Include="API\CustomRole\RoomUtils.cs" />
+    <Compile Include="API\CustomRole\SpawnAPI\RoomSpawnPoint.cs" />
+    <Compile Include="API\CustomRole\SpawnAPI\SpawnPoint.cs" />
+    <Compile Include="API\CustomRole\SpawnAPI\SpawnProperties.cs" />
     <Compile Include="API\Extension\PlayerCustomRole.cs" />
     <Compile Include="API\Extension\ExtensionPlayer.cs" />
     <Compile Include="API\PlayerUseHability.cs" />
