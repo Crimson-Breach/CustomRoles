@@ -27,6 +27,8 @@ namespace CustomRolesCrimsonBreach
         [Description("Message shown when a player tries to check their skill info without having a CustomRole.")]
         public string YouNeedACustomRoleMessage { get; set; } = "You need to have a CustomRole to be able to see your skill information";
 
+        [Description("Configuration option: Command, ServerConfig, or Both.")]
+        public string AbilityUsage { get; set; } = "both";
 
         [Description("Enables or disables debug mode (for logging and testing purposes).")]
         public bool debug { get; set; } = false;
