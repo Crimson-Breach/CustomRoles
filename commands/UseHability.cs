@@ -13,7 +13,7 @@ namespace CustomRolesCrimsonBreach.commands;
 [CommandHandler(typeof(ClientCommandHandler))]
 public class UseHability : ICommand
 {
-    public string Command => "usarhabilidad";
+    public string Command => "useskill";
 
     public string[] Aliases => ["uh"];
 
