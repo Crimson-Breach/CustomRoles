@@ -23,10 +23,11 @@ namespace CustomRolesCrimsonBreach
 
         [Description("Message displayed when the skill cooldown has finished and is ready again.")]
         public string AbilityCooldownSuccesfull { get; set; } = "The skill is ready to be used again!";
+        [Description("Configuration option: Hint, broadcast, or Both.")]
+        public string ShowMessage { get; set; } = "both";
 
         [Description("Message shown when a player tries to check their skill info without having a CustomRole.")]
         public string YouNeedACustomRoleMessage { get; set; } = "You need to have a CustomRole to be able to see your skill information";
-
 
         [Description("Enables or disables debug mode (for logging and testing purposes).")]
         public bool debug { get; set; } = false;
