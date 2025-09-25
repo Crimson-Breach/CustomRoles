@@ -20,15 +20,17 @@ namespace CustomRolesCrimsonBreach.commands.Childs
         {
             Player executor = Player.Get(sender);
 
-            if (!executor.HasPermissions("customitems.give"))
+            // Permisos
+            if (executor != null && !executor.HasPermissions("customitems.give"))
             {
                 response = Main.Instance.Config.DontHaveAccess;
                 return false;
             }
 
+            // Uso básico
             if (arguments.Count == 0)
             {
-                response = "Usage: spawn <CustomRole ID/Name> [player name/UserID/*]";
+                response = "Usage: .customroles spawn <CustomRole ID/Name> [player name/UserID/*]";
                 return false;
             }
 
@@ -36,7 +38,7 @@ namespace CustomRolesCrimsonBreach.commands.Childs
 
             var role = CustomRoleHandler.Registered.FirstOrDefault(i =>
                 i.Name.Equals(roleName, StringComparison.OrdinalIgnoreCase) ||
-                i.Id.ToString() == roleName);
+                i.Id.ToString().Equals(roleName, StringComparison.OrdinalIgnoreCase));
 
             if (role == null)
             {
@@ -46,11 +48,11 @@ namespace CustomRolesCrimsonBreach.commands.Childs
 
             List<Player> targets = new List<Player>();
 
+            // Si solo ponen el rol → se da a sí mismo (si es jugador)
             if (arguments.Count == 1)
             {
                 if (executor != null)
                     targets.Add(executor);
-
                 else
                 {
                     response = "You must specify a player when running from console.";
@@ -61,25 +63,32 @@ namespace CustomRolesCrimsonBreach.commands.Childs
             {
                 string targetArg = arguments.At(1);
 
-                if (targetArg == "*" || targetArg.ToLower() == "all")
+                if (targetArg == "*" || targetArg.Equals("all", StringComparison.OrdinalIgnoreCase))
                 {
                     targets = Player.List.ToList();
                 }
                 else
                 {
-                    Player targetById = Player.List.FirstOrDefault(p => p.UserId == targetArg);
-                    if (targetById != null)
+                    targetArg = arguments.At(1);
+
+                    if (targetArg == "*" || targetArg.Equals("all", StringComparison.OrdinalIgnoreCase))
                     {
-                        targets.Add(targetById);
+                        targets = Player.List.ToList();
+                    }
+                    else if (int.TryParse(targetArg, out int playerId))
+                    {
+                        Player targetByServerId = Player.List.FirstOrDefault(p => p.PlayerId == playerId);
+                        if (targetByServerId != null)
+                            targets.Add(targetByServerId);
                     }
                     else
                     {
-                        // Buscar por nombre parcial
                         targets = Player.List
                             .Where(p => p.Nickname.IndexOf(targetArg, StringComparison.OrdinalIgnoreCase) >= 0)
                             .ToList();
                     }
                 }
+
             }
 
             if (targets.Count == 0)
