@@ -2,12 +2,8 @@
 
 using CustomRolesCrimsonBreach.API.CustomRole;
 using CustomRolesCrimsonBreach.Events;
-using LabApi.Features.Console;
-using LabApi.Features.Wrappers;
 using LabApi.Loader.Features.Plugins;
 using System;
-using UnityEngine;
-using UserSettings.ServerSpecific;
 
 namespace CustomRolesCrimsonBreach;
 
@@ -29,17 +25,6 @@ public class Main : Plugin<Config>
         LabApi.Events.Handlers.PlayerEvents.Death += playerHandler.OnKillDeath;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += playerHandler.OnChangedRole;
 
-        if (Config.AbilityUsage == "ServerConfig" || Config.AbilityUsage == "both")
-        {
-            ServerSpecificSettingsSync.DefinedSettings = new ServerSpecificSettingBase[2]
-            {
-                new SSGroupHeader("CustomRole"),
-                new SSKeybindSetting(201, "Use hability", KeyCode.Y, preventInteractionOnGui: true, allowSpectatorTrigger: true, "use your hability.")
-            };
-            ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingsUpdated;
-            ServerSpecificSettingsSync.SendToAll();
-        }
-
         CustomAbility.RegisterSkills();
         CustomRoleHandler.RegisterRoles();
     }
@@ -55,38 +40,4 @@ public class Main : Plugin<Config>
         playerHandler = null;
         Instance = null;
     }
-
-    private static void OnSettingsUpdated(ReferenceHub sender, ServerSpecificSettingBase setting)
-    {
-        Player player = Player.Get(sender);
-
-        if (player.IsHost)
-            return;
-
-        if (setting.CollectionId == 201)
-        {
-
-            Logger.Debug("Test", Main.Instance.Config.debug);
-            CustomRole role = CustomRole.GetRole(player);
-            if (role != null)
-            {
-                if (role.CustomAbility == null)
-                {
-                    return;
-                }
-
-                if (role.CustomAbility.NeedCooldown)
-                {
-                    role.CustomAbility?.OnUseWithCooldown(player);
-                }
-                else
-                {
-                    role.CustomAbility?.OnUse(player);
-                }
-            }
-        }
-
-
-    }
-
 }

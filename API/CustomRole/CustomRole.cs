@@ -81,7 +81,25 @@ public abstract class CustomRole
 
             if (DisplayMessageRole)
             {
-                player.SendHint(Main.Instance.Config.RoleAdded.Replace("%name%", Name), 10);
+                string message = Main.Instance.Config.RoleAdded.Replace("%name%", Name);
+                string mode = Main.Instance.Config.ShowMessage.ToLower();
+
+                switch (mode)
+                {
+                    case "hint":
+                        player.SendHint(message, 10);
+                        break;
+
+                    case "broadcast":
+                        player.SendBroadcast(message, 10);
+                        break;
+
+                    case "both":
+                    default:
+                        player.SendHint(message, 10);
+                        player.SendBroadcast(message, 10);
+                        break;
+                }
             }
 
             if (!GiveOnlyTheAbility)
