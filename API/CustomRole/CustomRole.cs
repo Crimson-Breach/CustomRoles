@@ -63,11 +63,13 @@ public abstract class CustomRole
 
     public virtual void EventsCustom()
     {
+        LabApi.Events.Handlers.PlayerEvents.Spawned += AddRoleEvent;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += PlayerChangeRole;
     }
 
     public virtual void UnEventsCustom()
     {
+        LabApi.Events.Handlers.PlayerEvents.Spawned -= AddRoleEvent;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole -= PlayerChangeRole;
     }
 
@@ -140,13 +142,6 @@ public abstract class CustomRole
 
 
             Logger.Debug($"{Name}: Item added {player.Nickname}", Main.Instance.Config.debug);
-            MEC.Timing.CallDelayed(0.5f, () =>
-            {
-                player.Scale = Scale;
-                player.MaxHealth = health;
-                player.Health = health;
-                player.CustomInfo = $"{CustomInfo}";
-            });
 
             foreach (string itemName in Inventory)
             {
@@ -159,10 +154,6 @@ public abstract class CustomRole
                 player.AddAmmo(ammo.Key, ammo.Value);
             }
         });
-
-
-        RoleAdded(player);
-        OnAssigned(player);
     }
 
     private void GiveHat(Player player)
@@ -215,6 +206,24 @@ public abstract class CustomRole
 
     public virtual void RoleAdded(Player player) 
     {
+    }
+
+    private void AddRoleEvent(PlayerSpawnedEventArgs ev)
+    {
+        if (!HasRole(ev.Player, this)) return;
+
+        MEC.Timing.CallDelayed(0.1f, () =>
+        {
+            if (ev.Player == null || ev.Player.GameObject == null) return;
+
+            ev.Player.Scale = this.Scale;
+            ev.Player.MaxHealth = this.health;
+            ev.Player.Health = this.health;
+            ev.Player.CustomInfo = $"{this.CustomInfo}";
+
+            RoleAdded(ev.Player);
+            OnAssigned(ev.Player);
+        });
     }
 
     private SpawnPoint? GetRandomSpawnPoint()
