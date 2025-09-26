@@ -3,6 +3,7 @@ using CustomRolesCrimsonBreach.Events;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
+using RemoteAdmin.Communication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ public abstract class CustomRole
     {
         if (CustomRoleHandler.Registered.Any(c => c.Id == Id)) return false;
         CustomRoleHandler.Registered.Add(this);
-        LabApi.Features.Console.Logger.Info($"Register: {Name} ({GetHashCode()})");
+        Logger.Info($"Register: {Name} ({GetHashCode()})");
         return true;
     }
 
@@ -46,11 +47,13 @@ public abstract class CustomRole
     public virtual void EventsCustom()
     {
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += PlayerChangeRole;
+        LabApi.Events.Handlers.PlayerEvents.Spawned += AddRoleEvent;
     }
 
     public virtual void UnEventsCustom()
     {
         LabApi.Events.Handlers.PlayerEvents.ChangedRole -= PlayerChangeRole;
+        LabApi.Events.Handlers.PlayerEvents.Spawned -= AddRoleEvent;
     }
 
     private void PlayerChangeRole(PlayerChangedRoleEventArgs ev)
@@ -69,7 +72,7 @@ public abstract class CustomRole
 
         MEC.Timing.CallDelayed(1.5f, () =>
         {
-            LabApi.Features.Console.Logger.Debug($"{Name}: Assingning role to {player.Nickname}, Role instance: {GetHashCode()}", Main.Instance.Config.debug);
+            Logger.Debug($"{Name}: Assingning role to {player.Nickname}, Role instance: {GetHashCode()}", Main.Instance.Config.debug);
 
             if (!_players.TryGetValue(player.UserId, out var roles))
             {
@@ -114,19 +117,11 @@ public abstract class CustomRole
                 }
             }
 
-
-            LabApi.Features.Console.Logger.Debug($"{Name}: Item added {player.Nickname}", Main.Instance.Config.debug);
-            MEC.Timing.CallDelayed(0.5f, () =>
-            {
-                player.Scale = Scale;
-                player.MaxHealth = health;
-                player.Health = health;
-                player.CustomInfo = $"{CustomInfo}";
-            });
+            Logger.Debug($"{Name}: Item added {player.Nickname}", Main.Instance.Config.debug);
 
             foreach (string itemName in Inventory)
             {
-                LabApi.Features.Console.Logger.Info($"{Name}: Adding {itemName} to inventory.");
+                Logger.Info($"{Name}: Adding {itemName} to inventory.");
                 TryAddItem(player, itemName);
             }
 
@@ -135,11 +130,25 @@ public abstract class CustomRole
                 player.AddAmmo(ammo.Key, ammo.Value);
             }
         });
-
-
-        RoleAdded(player);
-        OnAssigned(player);
     }
+
+    private void AddRoleEvent(PlayerSpawnedEventArgs ev)
+    {
+        if (!HasRole(ev.Player, this)) return;
+
+        MEC.Timing.CallDelayed(0.1f, () =>
+        {
+            if (ev.Player == null || ev.Player.GameObject == null) return;
+
+            ev.Player.Scale = this.Scale;
+            ev.Player.MaxHealth = this.health;
+            ev.Player.Health = this.health;
+            ev.Player.CustomInfo = $"{this.CustomInfo}";
+
+            RoleAdded(ev.Player);
+            OnAssigned(ev.Player);
+        });
+    } 
 
     public virtual void RoleAdded(Player player) 
     {
@@ -157,16 +166,16 @@ public abstract class CustomRole
 
     protected bool TryAddItem(Player player, string itemName)
     {
-        LabApi.Features.Console.Logger.Debug($"{Name}: TryAddItem intentando con: {itemName}", Main.Instance.Config.debug);
+        Logger.Debug($"{Name}: TryAddItem intentando con: {itemName}", Main.Instance.Config.debug);
 
         if (Enum.TryParse(itemName, out ItemType type))
         {
-            LabApi.Features.Console.Logger.Debug($"{Name}: Its a valid ItemType: {type}", Main.Instance.Config.debug);
+            Logger.Debug($"{Name}: Its a valid ItemType: {type}", Main.Instance.Config.debug);
             player.AddItem(type);
             return true;
         }
 
-        LabApi.Features.Console.Logger.Debug($"{Name}: TryAddItem error. {itemName} its not valid.", Main.Instance.Config.debug);
+        Logger.Debug($"{Name}: TryAddItem error. {itemName} its not valid.", Main.Instance.Config.debug);
         return false;
     }
     public virtual void RemoveRole(Player player)
