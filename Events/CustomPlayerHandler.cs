@@ -35,7 +35,16 @@ public class CustomPlayerHandler
         if (_assignedRoles.ContainsKey(ev.Player.UserId))
         {
             CustomRole existingRole = _assignedRoles[ev.Player.UserId];
-            Logger.Warn($"Player {playerIdentifier} already in _assignedRoles with role {existingRole.Name} (Instance: {existingRole.GetHashCode()}). Skipping role assignment logic.");
+            Logger.Warn($"Player {playerIdentifier} already has {existingRole.Name}. Reapplying inventory.");
+
+            existingRole.AddRole(ev.Player);
+            MEC.Timing.CallDelayed(0.2f, () =>
+            {
+                if (ev.Player == null || ev.Player.GameObject == null)
+                    return;
+
+                existingRole.ReapplyInventory(ev.Player);
+            });
             return;
         }
 
@@ -99,6 +108,7 @@ public class CustomPlayerHandler
             Logger.Debug($"No role selected for player {playerIdentifier} after weighted roll.", false);
         }
     }
+
 
     public void OnChangedRole(PlayerChangedRoleEventArgs ev)
     {

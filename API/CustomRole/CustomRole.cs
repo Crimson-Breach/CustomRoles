@@ -70,66 +70,79 @@ public abstract class CustomRole
     {
         if (HasRole(player, this)) return;
 
-        MEC.Timing.CallDelayed(1.5f, () =>
+        Logger.Debug($"{Name}: Assingning role to {player.Nickname}, Role instance: {GetHashCode()}", Main.Instance.Config.debug);
+
+        if (!_players.TryGetValue(player.UserId, out var roles))
         {
-            Logger.Debug($"{Name}: Assingning role to {player.Nickname}, Role instance: {GetHashCode()}", Main.Instance.Config.debug);
+            roles = new HashSet<CustomRole>();
+            _players[player.UserId] = roles;
+        }
 
-            if (!_players.TryGetValue(player.UserId, out var roles))
+        roles.Add(this);
+
+        if (DisplayMessageRole)
+        {
+            string message = Main.Instance.Config.RoleAdded.Replace("%name%", Name);
+            string mode = Main.Instance.Config.ShowMessage.ToLower();
+
+            switch (mode)
             {
-                roles = new HashSet<CustomRole>();
-                _players[player.UserId] = roles;
+                case "hint":
+                    player.SendHint(message, 10);
+                    break;
+
+                case "broadcast":
+                    player.SendBroadcast(message, 10);
+                    break;
+
+                case "both":
+                default:
+                    player.SendHint(message, 10);
+                    player.SendBroadcast(message, 10);
+                    break;
             }
+        }
 
-            roles.Add(this);
+        if (!GiveOnlyTheAbility)
+        {
+            player.SetRole(BaseRole);
 
-            if (DisplayMessageRole)
+            var spawnPoint = GetRandomSpawnPoint();
+            if (spawnPoint != null)
             {
-                string message = Main.Instance.Config.RoleAdded.Replace("%name%", Name);
-                string mode = Main.Instance.Config.ShowMessage.ToLower();
-
-                switch (mode)
-                {
-                    case "hint":
-                        player.SendHint(message, 10);
-                        break;
-
-                    case "broadcast":
-                        player.SendBroadcast(message, 10);
-                        break;
-
-                    case "both":
-                    default:
-                        player.SendHint(message, 10);
-                        player.SendBroadcast(message, 10);
-                        break;
-                }
+                player.Position = RoomUtils.GetSpawnPosition(spawnPoint);
+                player.Rotation = spawnPoint.Rotation;
             }
+        }
 
-            if (!GiveOnlyTheAbility)
-            {
-                player.SetRole(BaseRole);
+        Logger.Info($"{Name}: Inventory tiene {Inventory.Count} ítems.");
+        foreach (string itemName in Inventory)
+        {
+            Logger.Info($"{Name}: Adding {itemName} to inventory.");
+            TryAddItem(player, itemName);
+        }
 
-                var spawnPoint = GetRandomSpawnPoint();
-                if (spawnPoint != null)
-                {
-                    player.Position = RoomUtils.GetSpawnPosition(spawnPoint);
-                    player.Rotation = spawnPoint.Rotation;
-                }
-            }
+        foreach (KeyValuePair<ItemType, ushort> ammo in AmmoItems)
+        {
+            player.AddAmmo(ammo.Key, ammo.Value);
+        }
 
-            Logger.Debug($"{Name}: Item added {player.Nickname}", Main.Instance.Config.debug);
+        Logger.Debug($"{Name}: Item added {player.Nickname}", Main.Instance.Config.debug);
 
-            foreach (string itemName in Inventory)
-            {
-                Logger.Info($"{Name}: Adding {itemName} to inventory.");
-                TryAddItem(player, itemName);
-            }
+    }
 
-            foreach (KeyValuePair<ItemType, ushort> ammo in AmmoItems)
-            {
-                player.AddAmmo(ammo.Key, ammo.Value);
-            }
-        });
+    public void ReapplyInventory(Player player)
+    {
+        foreach (string itemName in Inventory)
+        {
+            Logger.Info($"{Name}: Reapplying {itemName} to inventory.");
+            TryAddItem(player, itemName);
+        }
+
+        foreach (var ammo in AmmoItems)
+        {
+            player.AddAmmo(ammo.Key, ammo.Value);
+        }
     }
 
     private void AddRoleEvent(PlayerSpawnedEventArgs ev)
