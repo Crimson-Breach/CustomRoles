@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using UnityEngine;
 
 namespace CustomRolesCrimsonBreach
 {
@@ -17,6 +18,10 @@ namespace CustomRolesCrimsonBreach
 
         [Description("Message displayed when a player uses their skill.")]
         public string UseHability { get; set; } = "skill used";
+        [Description("Use button")]
+        public bool UseButton { get; set; } = true;
+        [Description("KeyCode To use")]
+        public KeyCode KeyButton { get; set; } = KeyCode.R;
 
         [Description("Message shown when a player tries to use a skill that is on cooldown.")]
         public string AbilityCooldownMessage { get; set; } = "The skill is loading, wait MINUTES:SECONDS minutes.";
@@ -32,5 +37,8 @@ namespace CustomRolesCrimsonBreach
 
         [Description("Enables or disables debug mode (for logging and testing purposes).")]
         public bool debug { get; set; } = false;
+
+        [Description("Enables or disables friendlyfire mode.")]
+        public bool FriendlyFire { get; set; } = false;
     }
 }

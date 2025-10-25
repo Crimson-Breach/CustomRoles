@@ -1,6 +1,7 @@
 ﻿using CustomRolesCrimsonBreach.API.CustomRole.SpawnAPI;
 using CustomRolesCrimsonBreach.API.Extension;
 using CustomRolesCrimsonBreach.Events;
+using JetBrains.Annotations;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.Scp049Events;
 using LabApi.Features.Wrappers;
@@ -50,16 +51,25 @@ public abstract class CustomRole
 
     public virtual void EventsCustom()
     {
-        LabApi.Events.Handlers.Scp049Events.Attacking += OnPlagueHurting;
-        LabApi.Events.Handlers.PlayerEvents.Hurting += OnPlayerHurt;
+        if (!Main.Instance.Config.FriendlyFire)
+        {
+            LabApi.Events.Handlers.Scp049Events.Attacking += OnPlagueHurting;
+            LabApi.Events.Handlers.PlayerEvents.Hurting += OnPlayerHurt;
+        }
+
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += PlayerChangeRole;
         LabApi.Events.Handlers.PlayerEvents.Spawned += AddRoleEvent;
     }
 
     public virtual void UnEventsCustom()
     {
-        LabApi.Events.Handlers.Scp049Events.Attacking -= OnPlagueHurting;
-        LabApi.Events.Handlers.PlayerEvents.Hurting -= OnPlayerHurt;
+
+        if (!Main.Instance.Config.FriendlyFire)
+        {
+            LabApi.Events.Handlers.Scp049Events.Attacking -= OnPlagueHurting;
+            LabApi.Events.Handlers.PlayerEvents.Hurting -= OnPlayerHurt;
+        }
+
         LabApi.Events.Handlers.PlayerEvents.ChangedRole -= PlayerChangeRole;
         LabApi.Events.Handlers.PlayerEvents.Spawned -= AddRoleEvent;
     }

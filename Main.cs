@@ -16,14 +16,17 @@ public class Main : Plugin<Config>
     public override Version RequiredApiVersion => LabApi.Features.LabApiProperties.CurrentVersion;
     public static Main Instance { get; private set; }
     public CustomPlayerHandler playerHandler { get; set; }
+    public SSCustomRole Settings { get; private set; }
     public override void Enable()
     {
         Instance = this;
+        Settings = new SSCustomRole();
         playerHandler = new CustomPlayerHandler();
 
         LabApi.Events.Handlers.PlayerEvents.Spawned += playerHandler.OnSpawned;
         LabApi.Events.Handlers.PlayerEvents.Death += playerHandler.OnKillDeath;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += playerHandler.OnChangedRole;
+        Settings.Activate();
 
         CustomAbility.RegisterSkills();
         CustomRoleHandler.RegisterRoles();
@@ -31,6 +34,7 @@ public class Main : Plugin<Config>
 
     public override void Disable()
     {
+        Settings.Deactivate();
         LabApi.Events.Handlers.PlayerEvents.Spawned -= playerHandler.OnSpawned;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole -= playerHandler.OnChangedRole;
         LabApi.Events.Handlers.PlayerEvents.Death -= playerHandler.OnKillDeath;
@@ -38,6 +42,7 @@ public class Main : Plugin<Config>
         CustomRoleHandler.UnRegisterRoles();
         CustomAbility.UnRegisterSkills();
         playerHandler = null;
+        Settings = null;
         Instance = null;
     }
 }
