@@ -1,6 +1,8 @@
 ﻿using CustomRolesCrimsonBreach.API.CustomRole.SpawnAPI;
+using CustomRolesCrimsonBreach.API.Extension;
 using CustomRolesCrimsonBreach.Events;
 using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Events.Arguments.Scp049Events;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
 using RemoteAdmin.Communication;
@@ -8,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Utf8Json.Formatters;
 
 namespace CustomRolesCrimsonBreach.API.CustomRole;
 
@@ -30,6 +33,7 @@ public abstract class CustomRole
     public virtual int health { get; set; } = 100;
     public virtual int spawnNumber { get; set; } = 0;
     public virtual bool GiveOnlyTheAbility { get; set;} = false;
+    public virtual Team RolTeam { get; set; }
 
     public virtual bool TryRegister()
     {
@@ -46,22 +50,64 @@ public abstract class CustomRole
 
     public virtual void EventsCustom()
     {
+        LabApi.Events.Handlers.Scp049Events.Attacking += OnPlagueHurting;
+        LabApi.Events.Handlers.PlayerEvents.Hurting += OnPlayerHurt;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += PlayerChangeRole;
         LabApi.Events.Handlers.PlayerEvents.Spawned += AddRoleEvent;
     }
 
     public virtual void UnEventsCustom()
     {
+        LabApi.Events.Handlers.Scp049Events.Attacking -= OnPlagueHurting;
+        LabApi.Events.Handlers.PlayerEvents.Hurting -= OnPlayerHurt;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole -= PlayerChangeRole;
         LabApi.Events.Handlers.PlayerEvents.Spawned -= AddRoleEvent;
+    }
+
+    private void OnPlayerHurt(PlayerHurtingEventArgs ev) 
+    {
+        if (ev.Player == null) return;
+        if (ev.Attacker == null) return;
+        if (RolTeam == null) return;
+
+        if (ev.Player.Team == RolTeam)
+        {
+            ev.IsAllowed = false;
+            return;
+        }
+
+        if (ev.Attacker.Team == RolTeam)
+        {
+            ev.IsAllowed = false;
+            return;
+        }
+    }
+
+    private void OnPlagueHurting(Scp049AttackingEventArgs ev) 
+    {
+        if (ev.Player ==  null) return;
+        if (RolTeam == null) return;
+            
+        if (ev.Player.Team == RolTeam)
+        {
+            ev.IsAllowed = false;
+            return;
+        }
     }
 
     private void PlayerChangeRole(PlayerChangedRoleEventArgs ev)
     {
         if (KeepRoleWithScapeOrSomethingIDK) return;
 
+        if (ev.Player.IsSCP)
+        {
+            ev.Player.CustomInfo = null;
+            RemoveRole(ev.Player);
+        }
+
         if (ev.NewRole.RoleTypeId != BaseRole)
         {
+            ev.Player.CustomInfo = null;
             RemoveRole(ev.Player);
         }
     }
@@ -115,7 +161,7 @@ public abstract class CustomRole
             }
         }
 
-        Logger.Info($"{Name}: Inventory tiene {Inventory.Count} ítems.");
+            Logger.Info($"{Name}: Inventory tiene {Inventory.Count} ítems.");
         foreach (string itemName in Inventory)
         {
             Logger.Info($"{Name}: Adding {itemName} to inventory.");
@@ -156,17 +202,17 @@ public abstract class CustomRole
             ev.Player.Scale = this.Scale;
             ev.Player.MaxHealth = this.health;
             ev.Player.Health = this.health;
-            ev.Player.CustomInfo = $"{this.CustomInfo}";
+            if (HasRole(ev.Player, this))
+            {
+                ev.Player.CustomInfo = $"{this.CustomInfo}";
+            } 
 
-            RoleAdded(ev.Player);
             OnAssigned(ev.Player);
+            RoleAdded(ev.Player);
         });
-    } 
-
-    public virtual void RoleAdded(Player player) 
-    {
     }
 
+    public virtual void RoleAdded(Player player) { }
     private SpawnPoint? GetRandomSpawnPoint()
     {
         if (SpawnProperties == null || SpawnProperties.StaticSpawnPoints.Count == 0)
@@ -205,15 +251,11 @@ public abstract class CustomRole
             player.SendHint(Main.Instance.Config.RoleRemoved.Replace("%name%", Name), 10);
         }
 
-        player.CustomInfo = null;
-
         RemovedRole(player);
         OnRemoved(player);
     }
 
-    public virtual void RemovedRole(Player player)
-    {
-    }
+    public virtual void RemovedRole(Player player) { }
 
     public static bool HasRole(Player player, CustomRole role)
     {
