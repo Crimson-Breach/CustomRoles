@@ -76,6 +76,7 @@ public abstract class CustomRole
 
     private void OnPlayerHurt(PlayerHurtingEventArgs ev) 
     {
+        if (!HasRole(ev.Player, this)) return;
         if (ev.Player == null) return;
         if (ev.Attacker == null) return;
         if (RolTeam == null) return;
@@ -95,6 +96,8 @@ public abstract class CustomRole
 
     private void OnPlagueHurting(Scp049AttackingEventArgs ev) 
     {
+        if (!HasRole(ev.Player, this)) return;
+
         if (ev.Player ==  null) return;
         if (RolTeam == null) return;
             
