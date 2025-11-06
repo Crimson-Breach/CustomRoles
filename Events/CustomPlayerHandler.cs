@@ -51,7 +51,7 @@ public class CustomPlayerHandler
         var candidates = CustomRoleHandler.Registered
             .Where(role =>
                 role.BaseRole == ev.Role.RoleTypeId &&
-                (role.spawnNumber == 0 || !_roleCounts.TryGetValue(role.GetType(), out var count) || count < role.spawnNumber)
+                (role.SpawnNumber == 0 || !_roleCounts.TryGetValue(role.GetType(), out var count) || count < role.SpawnNumber)
             )
             .ToList();
 
@@ -63,7 +63,7 @@ public class CustomPlayerHandler
 
         Logger.Debug($"Found {candidates.Count} valid candidate roles (respecting spawn limits) for BaseRole {ev.Role.RoleTypeId} for player {playerIdentifier}.", false);
 
-        float totalWeight = candidates.Sum(r => r.SpawnPorcentage);
+        float totalWeight = candidates.Sum(r => r.SpawnPercentage);
         float roll = UnityEngine.Random.Range(0f, 100f);
 
         Logger.Debug($"Roll: {roll}, TotalCustomWeight: {totalWeight}", false);
@@ -78,7 +78,7 @@ public class CustomPlayerHandler
         CustomRole? selectedRole = null;
         foreach (var role in candidates)
         {
-            cumulative += role.SpawnPorcentage;
+            cumulative += role.SpawnPercentage;
             if (roll <= cumulative)
             {
                 selectedRole = role;
@@ -117,7 +117,7 @@ public class CustomPlayerHandler
         if (!_assignedRoles.TryGetValue(ev.Player.UserId, out var role))
             return;
 
-        if (ev.NewRole.RoleTypeId != role.BaseRole && !role.KeepRoleWithScapeOrSomethingIDK)
+        if (ev.NewRole.RoleTypeId != role.BaseRole && !role.KeepRoleOnEscape)
         {
             role.RemoveRole(ev.Player);
             _assignedRoles.Remove(ev.Player.UserId);

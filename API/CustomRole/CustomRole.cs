@@ -1,40 +1,44 @@
 ﻿using CustomRolesCrimsonBreach.API.CustomRole.SpawnAPI;
-using CustomRolesCrimsonBreach.API.Extension;
 using CustomRolesCrimsonBreach.Events;
-using JetBrains.Annotations;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.Scp049Events;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
-using RemoteAdmin.Communication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Utf8Json.Formatters;
 
 namespace CustomRolesCrimsonBreach.API.CustomRole;
 
 public abstract class CustomRole
 {
     protected static Dictionary<string, HashSet<CustomRole>> _players = new();
+
     public event EventHandler<SpawningCustomRole>? Spawning;
+
     public abstract string Name { get; }
     public abstract string CustomInfo { get; }
     public abstract uint Id { get; }
     public abstract RoleTypeId BaseRole { get; }
-    public abstract float SpawnPorcentage { get; }
+    public abstract float SpawnPercentage { get; }
     public abstract Vector3 Scale { get; set; }
     public abstract SpawnProperties SpawnProperties { get; set; }
-    public virtual bool DisplayMessageRole { get; set; } = true;
-    public virtual bool KeepRoleWithScapeOrSomethingIDK => false;
+
+    public virtual bool DisplayRoleMessage { get; set; } = true; 
+    public virtual bool KeepRoleOnEscape { get; set; } = false; 
+
     public virtual List<string> Inventory { get; set; } = new();
     public virtual Dictionary<ItemType, ushort> AmmoItems { get; set; } = new();
+
     public virtual CustomAbility CustomAbility { get; set; }
-    public virtual int health { get; set; } = 100;
-    public virtual int spawnNumber { get; set; } = 0;
-    public virtual bool GiveOnlyTheAbility { get; set;} = false;
-    public virtual Team RolTeam { get; set; }
+
+    public virtual int Health { get; set; } = 100; 
+    public virtual int SpawnNumber { get; set; } = 0; 
+    public virtual bool GiveOnlyAbility { get; set; } = false; 
+
+    public virtual Team RoleTeam { get; set; } 
+
 
     public virtual bool TryRegister()
     {
@@ -79,15 +83,15 @@ public abstract class CustomRole
         if (!HasRole(ev.Player, this)) return;
         if (ev.Player == null) return;
         if (ev.Attacker == null) return;
-        if (RolTeam == null) return;
+        if (RoleTeam == null) return;
 
-        if (ev.Player.Team == RolTeam)
+        if (ev.Player.Team == RoleTeam)
         {
             ev.IsAllowed = false;
             return;
         }
 
-        if (ev.Attacker.Team == RolTeam)
+        if (ev.Attacker.Team == RoleTeam)
         {
             ev.IsAllowed = false;
             return;
@@ -99,9 +103,9 @@ public abstract class CustomRole
         if (!HasRole(ev.Player, this)) return;
 
         if (ev.Player ==  null) return;
-        if (RolTeam == null) return;
+        if (RoleTeam == null) return;
             
-        if (ev.Player.Team == RolTeam)
+        if (ev.Player.Team == RoleTeam)
         {
             ev.IsAllowed = false;
             return;
@@ -110,9 +114,9 @@ public abstract class CustomRole
 
     private void PlayerChangeRole(PlayerChangedRoleEventArgs ev)
     {
-        if (KeepRoleWithScapeOrSomethingIDK) return;
+        if (KeepRoleOnEscape) return;
 
-        if (ev.Player.IsSCP)
+        if (ev.Player != null)
         {
             ev.Player.CustomInfo = null;
             RemoveRole(ev.Player);
@@ -139,7 +143,7 @@ public abstract class CustomRole
 
         roles.Add(this);
 
-        if (DisplayMessageRole)
+        if (DisplayRoleMessage)
         {
             string message = Main.Instance.Config.RoleAdded.Replace("%name%", Name);
             string mode = Main.Instance.Config.ShowMessage.ToLower();
@@ -162,7 +166,7 @@ public abstract class CustomRole
             }
         }
 
-        if (!GiveOnlyTheAbility)
+        if (!GiveOnlyAbility)
         {
             player.SetRole(BaseRole);
 
@@ -213,8 +217,8 @@ public abstract class CustomRole
             if (ev.Player == null || ev.Player.GameObject == null) return;
 
             ev.Player.Scale = this.Scale;
-            ev.Player.MaxHealth = this.health;
-            ev.Player.Health = this.health;
+            ev.Player.MaxHealth = this.Health;
+            ev.Player.Health = this.Health;
             if (HasRole(ev.Player, this))
             {
                 ev.Player.CustomInfo = $"{this.CustomInfo}";
@@ -259,7 +263,7 @@ public abstract class CustomRole
         if (roles.Count == 0)
             _players.Remove(player.UserId);
 
-        if (DisplayMessageRole) 
+        if (DisplayRoleMessage) 
         {
             player.SendHint(Main.Instance.Config.RoleRemoved.Replace("%name%", Name), 10);
         }
@@ -282,7 +286,7 @@ public abstract class CustomRole
     }
     public virtual void HandleRoleChange(Player player, RoleTypeId newRole)
     {
-        if (!KeepRoleWithScapeOrSomethingIDK && newRole != BaseRole)
+        if (!KeepRoleOnEscape && newRole != BaseRole)
         {
             RemoveRole(player);
         }
