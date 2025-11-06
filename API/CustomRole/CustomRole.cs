@@ -1,7 +1,9 @@
 ﻿using CustomRolesCrimsonBreach.API.CustomRole.SpawnAPI;
+using CustomRolesCrimsonBreach.API.Extension;
 using CustomRolesCrimsonBreach.Events;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.Scp049Events;
+using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Features.Wrappers;
 using PlayerRoles;
 using System;
@@ -61,6 +63,7 @@ public abstract class CustomRole
             LabApi.Events.Handlers.PlayerEvents.Hurting += OnPlayerHurt;
         }
 
+        LabApi.Events.Handlers.ServerEvents.RoundEnded += OnRoundEnd;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += PlayerChangeRole;
         LabApi.Events.Handlers.PlayerEvents.Spawned += AddRoleEvent;
     }
@@ -74,6 +77,7 @@ public abstract class CustomRole
             LabApi.Events.Handlers.PlayerEvents.Hurting -= OnPlayerHurt;
         }
 
+        LabApi.Events.Handlers.ServerEvents.RoundEnded -= OnRoundEnd;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole -= PlayerChangeRole;
         LabApi.Events.Handlers.PlayerEvents.Spawned -= AddRoleEvent;
     }
@@ -81,17 +85,18 @@ public abstract class CustomRole
     private void OnPlayerHurt(PlayerHurtingEventArgs ev) 
     {
         if (!HasRole(ev.Player, this)) return;
+
         if (ev.Player == null) return;
         if (ev.Attacker == null) return;
         if (RoleTeam == null) return;
 
-        if (ev.Player.Team == RoleTeam)
+        if (ev.Player.Team == this.RoleTeam)
         {
             ev.IsAllowed = false;
             return;
         }
 
-        if (ev.Attacker.Team == RoleTeam)
+        if (ev.Attacker.Team == this.RoleTeam)
         {
             ev.IsAllowed = false;
             return;
@@ -105,7 +110,7 @@ public abstract class CustomRole
         if (ev.Player ==  null) return;
         if (RoleTeam == null) return;
             
-        if (ev.Player.Team == RoleTeam)
+        if (ev.Player.Team == this.RoleTeam)
         {
             ev.IsAllowed = false;
             return;
@@ -116,16 +121,21 @@ public abstract class CustomRole
     {
         if (KeepRoleOnEscape) return;
 
-        if (ev.Player != null)
-        {
-            ev.Player.CustomInfo = null;
-            RemoveRole(ev.Player);
-        }
-
         if (ev.NewRole.RoleTypeId != BaseRole)
         {
             ev.Player.CustomInfo = null;
             RemoveRole(ev.Player);
+        }
+    }
+
+    private void OnRoundEnd(RoundEndedEventArgs ev) 
+    {
+        foreach (var player in Player.List)
+        {
+            if (!player.IsCustomRole()) return;
+
+            player.CustomInfo = null;
+            RemoveRole(player);
         }
     }
 
