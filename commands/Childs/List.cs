@@ -1,10 +1,8 @@
 ﻿using CommandSystem;
 using CustomRolesCrimsonBreach.Events;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomRolesCrimsonBreach.commands.Childs;
 
@@ -22,12 +20,12 @@ public class List : ICommand
 
         if (!items.Any())
         {
-            response = "There are no custom items registered.";
+            response = "There are no CustomRoles registered.";
             return false;
         }
 
         StringBuilder sb = new();
-        sb.AppendLine("Registered Custom Items:");
+        sb.AppendLine("Registered CustomRoles:");
 
         foreach (var item in items)
         {

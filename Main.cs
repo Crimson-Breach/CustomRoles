@@ -1,8 +1,7 @@
 ﻿global using Logger = LabApi.Features.Console.Logger;
-
-using CustomRolesCrimsonBreach.API.CustomRole;
 using CustomRolesCrimsonBreach.Events;
 using LabApi.Loader.Features.Plugins;
+using LabApi.Loader.Features.Plugins.Enums;
 using System;
 
 namespace CustomRolesCrimsonBreach;
@@ -10,13 +9,15 @@ namespace CustomRolesCrimsonBreach;
 public class Main : Plugin<Config>
 {
     public override string Name => "CrimsonCustomRole";
-    public override string Description => "Implementing the creation of Custom Roles for LabAPI";
+    public override string Description => "Implementing the creation of CustomRoles for LabAPI";
     public override string Author => "Davilone32";
-    public override Version Version => new(1, 0, 2);
+    public override Version Version => new(1, 2, 2, 3);
     public override Version RequiredApiVersion => LabApi.Features.LabApiProperties.CurrentVersion;
     public static Main Instance { get; private set; }
     public CustomPlayerHandler playerHandler { get; set; }
     public SSCustomRole Settings { get; private set; }
+    public override LoadPriority Priority => LoadPriority.Highest;
+    
     public override void Enable()
     {
         Instance = this;
@@ -26,10 +27,8 @@ public class Main : Plugin<Config>
         LabApi.Events.Handlers.PlayerEvents.Spawned += playerHandler.OnSpawned;
         LabApi.Events.Handlers.PlayerEvents.Death += playerHandler.OnKillDeath;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += playerHandler.OnChangedRole;
-        Settings.Activate();
 
-        CustomAbility.RegisterSkills();
-        CustomRoleHandler.RegisterRoles();
+        Settings.Activate();
     }
 
     public override void Disable()
@@ -39,8 +38,6 @@ public class Main : Plugin<Config>
         LabApi.Events.Handlers.PlayerEvents.ChangedRole -= playerHandler.OnChangedRole;
         LabApi.Events.Handlers.PlayerEvents.Death -= playerHandler.OnKillDeath;
 
-        CustomRoleHandler.UnRegisterRoles();
-        CustomAbility.UnRegisterSkills();
         playerHandler = null;
         Settings = null;
         Instance = null;

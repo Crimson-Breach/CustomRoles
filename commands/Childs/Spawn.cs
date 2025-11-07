@@ -2,99 +2,97 @@
 using CustomRolesCrimsonBreach.Events;
 using LabApi.Features.Permissions;
 using LabApi.Features.Wrappers;
-using RemoteAdmin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CustomRolesCrimsonBreach.commands.Childs
+namespace CustomRolesCrimsonBreach.commands.Childs;
+
+[CommandHandler(typeof(Parent))]
+public class Spawn : ICommand
 {
-    [CommandHandler(typeof(Parent))]
-    public class Spawn : ICommand
+    public string Command => "spawn";
+    public string[] Aliases => Array.Empty<string>();
+    public string Description => "Comando para spawn customrole";
+
+    public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        public string Command => "spawn";
-        public string[] Aliases => Array.Empty<string>();
-        public string Description => "Comando para spawn customrole";
+        Player executor = Player.Get(sender);
 
-        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
+        // Permisos
+        if (executor != null && !executor.HasPermissions("customitems.give"))
         {
-            Player executor = Player.Get(sender);
+            response = Main.Instance.Config.DontHaveAccess;
+            return false;
+        }
 
-            // Permisos
-            if (executor != null && !executor.HasPermissions("customitems.give"))
+        // Uso básico
+        if (arguments.Count == 0)
+        {
+            response = "Usage: .customroles spawn <CustomRole ID/Name> [player name/UserID/*]";
+            return false;
+        }
+
+        string roleName = arguments.At(0);
+
+        var role = CustomRoleHandler.Registered.FirstOrDefault(i =>
+            i.Name.Equals(roleName, StringComparison.OrdinalIgnoreCase) ||
+            i.Id.ToString().Equals(roleName, StringComparison.OrdinalIgnoreCase));
+
+        if (role == null)
+        {
+            response = $"Custom role '{roleName}' not found.";
+            return false;
+        }
+
+        List<Player> targets = new List<Player>();
+
+        // Si solo ponen el rol → se da a sí mismo (si es jugador)
+        if (arguments.Count == 1)
+        {
+            if (executor != null)
+                targets.Add(executor);
+            else
             {
-                response = Main.Instance.Config.DontHaveAccess;
+                response = "You must specify a player when running from console.";
                 return false;
             }
+        }
+        else
+        {
+            string targetArg = arguments.At(1);
 
-            // Uso básico
-            if (arguments.Count == 0)
+            if (targetArg == "*" || targetArg.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
-                response = "Usage: .customroles spawn <CustomRole ID/Name> [player name/UserID/*]";
-                return false;
+                targets = Player.List.ToList();
             }
-
-            string roleName = arguments.At(0);
-
-            var role = CustomRoleHandler.Registered.FirstOrDefault(i =>
-                i.Name.Equals(roleName, StringComparison.OrdinalIgnoreCase) ||
-                i.Id.ToString().Equals(roleName, StringComparison.OrdinalIgnoreCase));
-
-            if (role == null)
+            else if (int.TryParse(targetArg, out int playerId))
             {
-                response = $"Custom role '{roleName}' not found.";
-                return false;
-            }
-
-            List<Player> targets = new List<Player>();
-
-            // Si solo ponen el rol → se da a sí mismo (si es jugador)
-            if (arguments.Count == 1)
-            {
-                if (executor != null)
-                    targets.Add(executor);
-                else
-                {
-                    response = "You must specify a player when running from console.";
-                    return false;
-                }
+                Player targetByServerId = Player.List.FirstOrDefault(p => p.PlayerId == playerId);
+                if (targetByServerId != null)
+                    targets.Add(targetByServerId);
             }
             else
             {
-                string targetArg = arguments.At(1);
-
-                if (targetArg == "*" || targetArg.Equals("all", StringComparison.OrdinalIgnoreCase))
-                {
-                    targets = Player.List.ToList();
-                }
-                else if (int.TryParse(targetArg, out int playerId))
-                {
-                    Player targetByServerId = Player.List.FirstOrDefault(p => p.PlayerId == playerId);
-                    if (targetByServerId != null)
-                        targets.Add(targetByServerId);
-                }
-                else
-                {
-                    targets = Player.List
-                        .Where(p => p.Nickname.IndexOf(targetArg, StringComparison.OrdinalIgnoreCase) >= 0)
-                        .ToList();
-                }
+                targets = Player.List
+                    .Where(p => p.Nickname.IndexOf(targetArg, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .ToList();
             }
-
-
-            if (targets.Count == 0)
-            {
-                response = "No valid target players found.";
-                return false;
-            }
-
-            foreach (Player target in targets)
-            {
-                role.AddRole(target);
-            }
-
-            response = $"Gave {role.Name} to {targets.Count} player(s).";
-            return true;
         }
+
+
+        if (targets.Count == 0)
+        {
+            response = "No valid target players found.";
+            return false;
+        }
+
+        foreach (Player target in targets)
+        {
+            role.AddRole(target);
+        }
+
+        response = $"Gave {role.Name} to {targets.Count} player(s).";
+        return true;
     }
 }

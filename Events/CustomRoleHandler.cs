@@ -21,12 +21,39 @@ public class CustomRoleHandler
     public static IEnumerable<CustomRole> RegisterRoles(bool skipReflection = false, object? overrideClass = null)
     {
         List<CustomRole> items = new();
-        Assembly assembly = Assembly.GetCallingAssembly();
+        Assembly assembly = overrideClass == null ? Assembly.GetCallingAssembly() : overrideClass.GetType().Assembly;
 
-        foreach (Type type in assembly.GetTypes())
+        Type[] types;
+
+        try
         {
-            if (!type.IsSubclassOf(typeof(CustomRole)))
+            types = assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            types = ex.Types.Where(t => t != null).ToArray();
+        }
+
+        foreach (Type type in types)
+        {
+            if (!type.IsSubclassOf(typeof(CustomRole)) || type.IsAbstract)
                 continue;
+
+            if (Registered.Any(r => r.GetType() == type))
+                continue;
+
+            try
+            {
+                if (Activator.CreateInstance(type) is CustomRole instance && instance.TryRegister())
+                {
+                    instance.EventsCustom();
+                    items.Add(instance);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al registrar {type.FullName}: {ex}");
+            }
         }
 
         return items;

@@ -1,7 +1,6 @@
 ﻿using CustomRolesCrimsonBreach.API.CustomRole;
 using CustomRolesCrimsonBreach.API.Extension;
 using LabApi.Events.Arguments.PlayerEvents;
-using LabApi.Features.Console;
 using System;
 using System.Collections.Generic;
 using System.Data;
