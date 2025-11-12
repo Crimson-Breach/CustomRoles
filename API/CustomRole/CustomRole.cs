@@ -33,7 +33,7 @@ public abstract class CustomRole
     public virtual List<string> Inventory { get; set; } = new();
     public virtual Dictionary<ItemType, ushort> AmmoItems { get; set; } = new();
 
-    public virtual CustomAbility CustomAbility { get; set; }
+    public virtual CustomHability CustomAbility { get; set; }
 
     public virtual int Health { get; set; } = 100; 
     public virtual int SpawnNumber { get; set; } = 0; 

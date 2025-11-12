@@ -75,7 +75,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\CustomRole\CustomAbility.cs" />
+    <Compile Include="API\CustomRole\CustomHability.cs" />
     <Compile Include="API\CustomRole\CustomRole.cs" />
     <Compile Include="API\CustomRole\RoomUtils.cs" />
     <Compile Include="API\CustomRole\SpawnAPI\RoomSpawnPoint.cs" />

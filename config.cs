@@ -24,10 +24,10 @@ public sealed class Config
     public KeyCode KeyButton { get; set; } = KeyCode.R;
 
     [Description("Message shown when a player tries to use a skill that is on cooldown.")]
-    public string AbilityCooldownMessage { get; set; } = "The skill is loading, wait MINUTES:SECONDS minutes.";
+    public string HabilityCooldownMessage { get; set; } = "The skill is loading, wait MINUTES:SECONDS minutes.";
 
     [Description("Message displayed when the skill cooldown has finished and is ready again.")]
-    public string AbilityCooldownSuccesfull { get; set; } = "The skill is ready to be used again!";
+    public string HabilityCooldownSuccesfull { get; set; } = "The skill is ready to be used again!";
 
     [Description("Message shown when a player tries to check their skill info without having a CustomRole.")]
     public string YouNeedACustomRoleMessage { get; set; } = "You need to have a CustomRole to be able to see your skill information";
