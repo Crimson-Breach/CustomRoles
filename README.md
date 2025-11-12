@@ -115,7 +115,7 @@ namespace AllCustomRoles.CustomRoles.SCP106
         public override RoleTypeId BaseRole => RoleTypeId.Scp106;
         public override float SpewnPorcentage => 50;
         public override Vector3 Scale { get; set; } = Vector3.one;
-        public override CustomAbility CustomAbility { get; set; } = new _106StalkieHab();
+        public override CustomHAbility CustomHAbility { get; set; } = new _106StalkieHab();
         public override int Health { get; set; } = 2500;
     }
 }
