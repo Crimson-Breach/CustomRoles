@@ -22,19 +22,19 @@ public class UseHability : ICommand
         CustomRole role = CustomRole.GetRole(player);
         if (role != null)
         {
-            if (role.CustomAbility == null)
+            if (role.CustomHability == null)
             {
                 response = Main.Instance.Config.YouDontHaveSkillInYourCustomRole;
                 return false;
             }
 
-            if (role.CustomAbility.NeedCooldown)
+            if (role.CustomHability.NeedCooldown)
             {
-                role.CustomAbility?.OnUseWithCooldown(player);
+                role.CustomHability?.OnUseWithCooldown(player);
             }
             else
             {
-                role.CustomAbility?.OnUse(player);
+                role.CustomHability?.OnUse(player);
             }
 
             response = Main.Instance.Config.UseHability;

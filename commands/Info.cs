@@ -21,13 +21,13 @@ public class Info : ICommand
         CustomRole role = CustomRole.GetRole(player);
         if (role != null)
         {
-            if (role.CustomAbility == null)
+            if (role.CustomHability == null)
             {
                 response = "Your CustomRole does not have an assigned skill";
                 return false;
             }
 
-            response = role.CustomAbility.Description;
+            response = role.CustomHability.Description;
             return true;
         }
 

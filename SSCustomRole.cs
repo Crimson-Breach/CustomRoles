@@ -11,7 +11,7 @@ public class SSCustomRole
 
     public void Activate()
     {
-        ButtonTuUseHability = new SSKeybindSetting(null, "Use Skill" ,Main.Instance.Config.KeyButton);
+        ButtonTuUseHability = new SSKeybindSetting(null, "Use Hability" ,Main.Instance.Config.KeyButton);
 
         var settings = new ServerSpecificSettingBase[2]
         {
@@ -41,18 +41,18 @@ public class SSCustomRole
             CustomRole role = CustomRole.GetRole(player);
             if (role != null)
             {
-                if (role.CustomAbility == null)
+                if (role.CustomHability == null)
                 {
                     return;
                 }
 
-                if (role.CustomAbility.NeedCooldown)
+                if (role.CustomHability.NeedCooldown)
                 {
-                    role.CustomAbility?.OnUseWithCooldown(player);
+                    role.CustomHability?.OnUseWithCooldown(player);
                 }
                 else
                 {
-                    role.CustomAbility?.OnUse(player);
+                    role.CustomHability?.OnUse(player);
                 }
 
                 return;
