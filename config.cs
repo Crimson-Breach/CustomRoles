@@ -40,4 +40,5 @@ public sealed class Config
 
     [Description("Enables or disables friendlyfire mode.")]
     public bool FriendlyFire { get; set; } = false;
+    public float DefaultHumanSpawnChance { get; set; } = 40f;
 }

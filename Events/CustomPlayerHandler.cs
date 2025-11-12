@@ -62,9 +62,16 @@ public class CustomPlayerHandler
 
         Logger.Debug($"Found {candidates.Count} valid candidate roles (respecting spawn limits) for BaseRole {ev.Role.RoleTypeId} for player {playerIdentifier}.", false);
 
-        float totalWeight = candidates.Sum(r => r.SpawnPercentage);
-        float roll = UnityEngine.Random.Range(0f, 100f);
+        float totalCustomWeight = candidates.Sum(r => r.SpawnPercentage);
+        float totalWeight = totalCustomWeight + Main.Instance.Config.DefaultHumanSpawnChance;
 
+        if (totalWeight <= 0f)
+        {
+            Logger.Warn("Total spawn weight is zero — no roles can be selected.");
+            return;
+        }
+
+        float roll = UnityEngine.Random.Range(0f, totalWeight);
         Logger.Debug($"Roll: {roll}, TotalCustomWeight: {totalWeight}", false);
 
         if (roll > totalWeight)

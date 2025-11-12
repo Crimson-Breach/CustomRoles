@@ -37,16 +37,17 @@ public abstract class CustomRole
 
     public virtual int Health { get; set; } = 100; 
     public virtual int SpawnNumber { get; set; } = 0; 
-    public virtual bool GiveOnlyAbility { get; set; } = false; 
+    public virtual bool GiveOnlyAbility { get; set; } = false;
 
-    public virtual Team RoleTeam { get; set; } 
-
+    public virtual Team RoleTeam { get; set; } = Team.OtherAlive;
+    private bool _eventsRegistered;
 
     public virtual bool TryRegister()
     {
         if (CustomRoleHandler.Registered.Any(c => c.Id == Id)) return false;
         CustomRoleHandler.Registered.Add(this);
         Logger.Info($"Register: {Name} ({GetHashCode()})");
+
         return true;
     }
 
@@ -57,6 +58,10 @@ public abstract class CustomRole
 
     public virtual void EventsCustom()
     {
+
+        if (_eventsRegistered) return;
+        _eventsRegistered = true;
+
         if (!Main.Instance.Config.FriendlyFire)
         {
             LabApi.Events.Handlers.Scp049Events.Attacking += OnPlagueHurting;
@@ -70,7 +75,7 @@ public abstract class CustomRole
 
     public virtual void UnEventsCustom()
     {
-
+        _eventsRegistered = false;
         if (!Main.Instance.Config.FriendlyFire)
         {
             LabApi.Events.Handlers.Scp049Events.Attacking -= OnPlagueHurting;
@@ -88,18 +93,11 @@ public abstract class CustomRole
 
         if (ev.Player == null) return;
         if (ev.Attacker == null) return;
-        if (RoleTeam == null) return;
+        if (RoleTeam == Team.OtherAlive) return;
 
-        if (ev.Player.Team == this.RoleTeam)
+        if (ev.Attacker.Team == RoleTeam && ev.Player.Team == RoleTeam)
         {
             ev.IsAllowed = false;
-            return;
-        }
-
-        if (ev.Attacker.Team == this.RoleTeam)
-        {
-            ev.IsAllowed = false;
-            return;
         }
     }
 
@@ -108,8 +106,8 @@ public abstract class CustomRole
         if (!HasRole(ev.Player, this)) return;
 
         if (ev.Player ==  null) return;
-        if (RoleTeam == null) return;
-            
+        if (RoleTeam == Team.OtherAlive) return;
+
         if (ev.Player.Team == this.RoleTeam)
         {
             ev.IsAllowed = false;
@@ -132,7 +130,7 @@ public abstract class CustomRole
     {
         foreach (var player in Player.List)
         {
-            if (!player.IsCustomRole()) return;
+            if (!player.IsCustomRole()) continue;
 
             player.CustomInfo = null;
             RemoveRole(player);
@@ -304,9 +302,4 @@ public abstract class CustomRole
 
     protected virtual void OnAssigned(Player player) { }
     protected virtual void OnRemoved(Player player) { }
-
-    public static implicit operator HashSet<object>(CustomRole v)
-    {
-        throw new NotImplementedException();
-    }
 }
