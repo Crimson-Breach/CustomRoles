@@ -33,14 +33,23 @@ role_removed: <b><color=yellow>You are <color=red>no longer</color> <color=blue>
 you_dont_have_skill_in_your_custom_role: Your CustomRole does not have an assigned skill
 # Message displayed when a player uses their skill.
 use_hability: skill used
+# Use button
+use_button: true
+# KeyCode To use
+key_button: R
 # Message shown when a player tries to use a skill that is on cooldown.
-ability_cooldown_message: The skill is loading, wait MINUTES:SECONDS minutes.
+hability_cooldown_message: The skill is loading, wait MINUTES:SECONDS minutes.
 # Message displayed when the skill cooldown has finished and is ready again.
-ability_cooldown_succesfull: The skill is ready to be used again!
+hability_cooldown_succesfull: The skill is ready to be used again!
 # Message shown when a player tries to check their skill info without having a CustomRole.
 you_need_a_custom_role_message: You need to have a CustomRole to be able to see your skill information
+# Configuration option: Hint, broadcast, or Both.
+show_message: both
 # Enables or disables debug mode (for logging and testing purposes).
 debug: false
+# Enables or disables friendlyfire mode.
+friendly_fire: false
+default_human_spawn_chance: 40
 ```
 
 # USAGE
