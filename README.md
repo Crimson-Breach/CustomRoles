@@ -1,5 +1,12 @@
 A API to make a CustomRoles and CustomHabilitys for LabApi
 
+# Important
+
+> 💡 **Note:**  
+> If you need to use CustomItems inside your CustomRole, you need this  
+> [CustomItemsAPI](https://github.com/SlejmUr/CustomItemsAPI).  
+> (It's not obligatory)
+
 # Commands
 ```
 .useskill
