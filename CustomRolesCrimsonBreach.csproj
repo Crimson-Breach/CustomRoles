@@ -94,6 +94,7 @@
     <Compile Include="config.cs" />
     <Compile Include="Events\CustomPlayerHandler.cs" />
     <Compile Include="Events\CustomRoleHandler.cs" />
+    <Compile Include="Intergrations\CustomItemsAPI.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SSCustomRole.cs" />

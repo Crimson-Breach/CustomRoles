@@ -1,6 +1,7 @@
 ﻿using CustomRolesCrimsonBreach.API.CustomRole.SpawnAPI;
 using CustomRolesCrimsonBreach.API.Extension;
 using CustomRolesCrimsonBreach.Events;
+using CustomRolesCrimsonBreach.Intergrations;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.Scp049Events;
 using LabApi.Events.Arguments.ServerEvents;
@@ -204,6 +205,9 @@ public abstract class CustomRole
 
     public void ReapplyInventory(Player player)
     {
+        foreach (Item item in player.Items)
+            player.RemoveItem(item);
+
         foreach (string itemName in Inventory)
         {
             Logger.Info($"{Name}: Reapplying {itemName} to inventory.");
@@ -258,6 +262,8 @@ public abstract class CustomRole
             player.AddItem(type);
             return true;
         }
+        else
+            CustomItemsAPI.TryGiveCustomItem(itemName, player);
 
         Logger.Debug($"{Name}: TryAddItem error. {itemName} its not valid.", Main.Instance.Config.debug);
         return false;
