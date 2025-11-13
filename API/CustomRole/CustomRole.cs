@@ -187,13 +187,6 @@ public abstract class CustomRole
             }
         }
 
-        Logger.Info($"{Name}: Inventory tiene {Inventory.Count} ítems.");
-        foreach (string itemName in Inventory)
-        {
-            Logger.Info($"{Name}: Adding {itemName} to inventory.");
-            //TryAddItem(player, itemName);;
-        }
-
         foreach (KeyValuePair<ItemType, ushort> ammo in AmmoItems)
         {
             player.AddAmmo(ammo.Key, ammo.Value);
@@ -210,7 +203,7 @@ public abstract class CustomRole
 
         foreach (string itemName in Inventory)
         {
-            Logger.Info($"{Name}: Reapplying {itemName} to inventory.");
+            Logger.Debug($"{Name}: Reapplying {itemName} to inventory.", Main.Instance.Config.debug);
             TryAddItem(player, itemName);
         }
 
