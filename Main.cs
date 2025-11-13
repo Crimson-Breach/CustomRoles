@@ -1,5 +1,6 @@
 ﻿global using Logger = LabApi.Features.Console.Logger;
 using CustomRolesCrimsonBreach.Events;
+using CustomRolesCrimsonBreach.Intergrations;
 using LabApi.Loader.Features.Plugins;
 using LabApi.Loader.Features.Plugins.Enums;
 using System;
@@ -27,6 +28,7 @@ public class Main : Plugin<Config>
         LabApi.Events.Handlers.PlayerEvents.Spawned += playerHandler.OnSpawned;
         LabApi.Events.Handlers.PlayerEvents.Death += playerHandler.OnKillDeath;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole += playerHandler.OnChangedRole;
+        LabApi.Events.Handlers.ServerEvents.WaitingForPlayers += OnWaitingForPlayers;
 
         Settings.Activate();
     }
@@ -37,9 +39,15 @@ public class Main : Plugin<Config>
         LabApi.Events.Handlers.PlayerEvents.Spawned -= playerHandler.OnSpawned;
         LabApi.Events.Handlers.PlayerEvents.ChangedRole -= playerHandler.OnChangedRole;
         LabApi.Events.Handlers.PlayerEvents.Death -= playerHandler.OnKillDeath;
+        LabApi.Events.Handlers.ServerEvents.WaitingForPlayers -= OnWaitingForPlayers;
 
         playerHandler = null;
         Settings = null;
         Instance = null;
+    }
+
+    private static void OnWaitingForPlayers()
+    {
+        CustomItemsAPI.Init();
     }
 }
