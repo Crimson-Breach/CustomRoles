@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // La información general de un ensamblado se controla mediante el siguiente 
@@ -8,9 +7,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("CustomRolesCrimsonBreach")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Atlas Playbook v0.4.1")]
+[assembly: AssemblyCompany("SpaidDidce")]
 [assembly: AssemblyProduct("CustomRolesCrimsonBreach")]
-[assembly: AssemblyCopyright("Copyright © Atlas Playbook v0.4.1 2025")]
+[assembly: AssemblyCopyright("Copyright © SpaidDidce 2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

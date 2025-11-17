@@ -19,14 +19,12 @@ public class Spawn : ICommand
     {
         Player executor = Player.Get(sender);
 
-        // Permisos
         if (executor != null && !executor.HasPermissions("customitems.give"))
         {
             response = Main.Instance.Config.DontHaveAccess;
             return false;
         }
 
-        // Uso básico
         if (arguments.Count == 0)
         {
             response = "Usage: .customroles spawn <CustomRole ID/Name> [player name/UserID/*]";
@@ -47,7 +45,6 @@ public class Spawn : ICommand
 
         List<Player> targets = new List<Player>();
 
-        // Si solo ponen el rol → se da a sí mismo (si es jugador)
         if (arguments.Count == 1)
         {
             if (executor != null)
@@ -64,17 +61,17 @@ public class Spawn : ICommand
 
             if (targetArg == "*" || targetArg.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
-                targets = Player.List.ToList();
+                targets = Player.ReadyList.ToList();
             }
             else if (int.TryParse(targetArg, out int playerId))
             {
-                Player targetByServerId = Player.List.FirstOrDefault(p => p.PlayerId == playerId);
+                Player targetByServerId = Player.ReadyList.FirstOrDefault(p => p.PlayerId == playerId);
                 if (targetByServerId != null)
                     targets.Add(targetByServerId);
             }
             else
             {
-                targets = Player.List
+                targets = Player.ReadyList
                     .Where(p => p.Nickname.IndexOf(targetArg, StringComparison.OrdinalIgnoreCase) >= 0)
                     .ToList();
             }

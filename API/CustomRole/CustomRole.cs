@@ -129,7 +129,7 @@ public abstract class CustomRole
 
     private void OnRoundEnd(RoundEndedEventArgs ev) 
     {
-        foreach (var player in Player.List)
+        foreach (var player in Player.ReadyList)
         {
             if (!player.IsCustomRole()) continue;
 
